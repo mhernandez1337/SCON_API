@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\WebSupplementalAPI.csproj": {}
+    "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\WebSupplementalAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\WebSupplementalAPI.csproj": {
+    "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\WebSupplementalAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\WebSupplementalAPI.csproj",
+        "projectUniqueName": "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\WebSupplementalAPI.csproj",
         "projectName": "WebSupplementalAPI",
-        "projectPath": "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\WebSupplementalAPI.csproj",
+        "projectPath": "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\WebSupplementalAPI.csproj",
         "packagesPath": "C:\\Users\\mhernandez\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\obj\\",
+        "outputPath": "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\mhernandez\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -74,24 +74,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[6.0.16, 6.0.16]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[6.0.16, 6.0.16]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[6.0.16, 6.0.16]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[6.0.16, 6.0.16]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -100,7 +82,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.105\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }

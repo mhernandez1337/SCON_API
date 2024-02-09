@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "m+s4uilSrdikQCkUaSVm9cByJRFBhUB1aGLODI/YaDak1CtQLvHeeKmqrW60dS9cVksomRJ5yqg7G7ndN1p6fg==",
+  "dgSpecHash": "wfmCpeQ6VUnUCOk20yV+szXV0aArpPz8D7HJ+pCg5qFhoHMRw/P8anwV0743Ib8HjSYaL3V9FplDuV2HwI6gUg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\WebSupplementalAPI.csproj",
+  "projectFilePath": "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\WebSupplementalAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mhernandez\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\mhernandez\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

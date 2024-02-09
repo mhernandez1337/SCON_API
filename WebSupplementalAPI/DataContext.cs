@@ -23,6 +23,8 @@ namespace WebSupplementalAPI
         public DbSet<Department> departments=> Set<Department>();
         public DbSet<JudicialPosition> positions=> Set<JudicialPosition>();
         public DbSet<JudicialHistoryData> historyData => Set<JudicialHistoryData>();
+        public DbSet<Mapbox> mapboxes => Set<Mapbox>();
+        public DbSet<FindACourt> findacourt => Set<FindACourt>();
 
     }
 }

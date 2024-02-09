@@ -10,6 +10,14 @@ using System.Data.SqlClient;
 using System.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Hosting;
+using Azure.Core;
+using System.Text;
+using Microsoft.AspNetCore.Builder;
+using static System.Net.Mime.MediaTypeNames;
+using Microsoft.Identity.Client;
+using Newtonsoft.Json.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,9 +45,58 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-//Set Cors
+
+//Set Cors - Must be set before the API Key and Referer Middleware!
 app.UseCors("corsapp");
+
+if (app.Environment.IsProduction())
+{
+    app.UseMiddleware<ApiKeyMiddleware>();
+    app.UseMiddleware<RefererKeyMiddleWare>();
+}
+
+
 app.UseHttpsRedirection();
+
+//Find a Court
+app.MapGet("/api/FindACourt/{id}", async (DataContext context, int id) =>{
+    var response = await context.findacourt.Where(s => s.type_ID.Equals(id)).OrderBy(s => s.name).ToListAsync();
+    return response;
+});
+
+// Individual Court for Find a Court
+app.MapGet("/api/FindACourt/Court/{courtID}", async (DataContext context, int courtID) => {
+    var response = await context.findacourt.Where(s => s.id.Equals(courtID)).ToListAsync();
+    return response[0];
+});
+
+//Mapbox
+app.MapGet("/api/Mapbox", async (DataContext context, HttpContext http) =>{
+    var response = await context.mapboxes.OrderBy(s => s.courtId).ToListAsync();
+    response.RemoveAll(s => s.courtId == 37);
+    
+    return response;
+});
+
+// Testing Referer
+app.MapGet("/api/urlRequest/{urlType}/{key}", async (DataContext context, HttpContext http, string key, string urlType) => {
+
+    byte[] decodedKey = Convert.FromBase64String(key);
+    string decodedString = Encoding.UTF8.GetString(decodedKey);
+    //var response = await context.advanceopinions.Where(s => s.caseNumber.Equals(123456)).Select(s => s.docurl).Take(1).ToArrayAsync();
+    string url = "";
+    if (urlType == "doc")
+    {
+        string[] strArr = decodedString.Split(new string[] { "_" }, StringSplitOptions.None);
+        url = "https://caseinfo.nvsupremecourt.us/document/view.do?csNameID=" + strArr[0] + "&csIID=" + strArr[1] + "&deLinkID=" + strArr[2] + "&onBaseDocumentNumber=" + strArr[3];
+    }
+    else {
+
+        url = "https://caseinfo.nvsupremecourt.us/public/caseView.do?csIID=" + decodedString;
+    }
+
+    return new JsonResult(url);
+});
 
 //Get all Oral Arguments
 app.MapGet("/api/OralArguments", async (DataContext context) => {
@@ -117,25 +174,182 @@ app.MapGet("/api/JudicialHistory/Search/{id}", async (DataContext context, int i
 });
 
 //Get all Advance Opinions
-app.MapGet("/api/AdvanceOpinions", async (DataContext context) => await context.advanceopinions.OrderByDescending(s => s.date.Year).ThenByDescending(s => s.advanceNumber).ToListAsync());
+app.MapGet("/api/AdvanceOpinions", async (DataContext context) =>
+{
+    var response = await context.advanceopinions.OrderByDescending(s => s.date.Year).ThenByDescending(s => s.advanceNumber).ToArrayAsync();
+    
+    //Encode the csNameID, CSIID, deLinkID,, and onBaseDocumentNumber
+    for(int i = 0; i < response.Length; i++)
+    {
+        var tempDocUrl = response[i].docurl;
+        var tempCaseUrl = response[i].caseurl;
+
+        string docUrlParams = "";
+        string[] docUrlArr = tempDocUrl.Split(new string[] { "=" }, StringSplitOptions.None);
+
+        string[] caseUrlArr = tempCaseUrl.Split(new string[] { "=" }, StringSplitOptions.None);
+        string caseUrlParam = caseUrlArr[1];
+
+        for (int j = 1; j < docUrlArr.Length; j++)
+        {
+            string[] docUrlArr2 = docUrlArr[j].Split(new string[] { "&" }, StringSplitOptions.None);
+            docUrlParams += docUrlArr2[0];
+            if (j != docUrlArr.Length - 1)
+            {
+                docUrlParams += "_";
+            }
+        }
+        if(docUrlParams.EndsWith(" "))
+        {
+            docUrlParams = docUrlParams.TrimEnd(docUrlParams[docUrlParams.Length - 1]);
+        }
+        byte[] docHash = Encoding.UTF8.GetBytes(docUrlParams);
+        response[i].docurl = Convert.ToBase64String(docHash);
+
+        byte[] caseHash = Encoding.UTF8.GetBytes(caseUrlParam);
+        response[i].caseurl = Convert.ToBase64String(caseHash);
+    }
+
+    return response;
+});
 
 //Get all admin orders
-app.MapGet("/api/AdminOrders", async (DataContext context) => await context.adminorders.OrderByDescending(s => s.date).ToListAsync());
+app.MapGet("/api/AdminOrders", async (DataContext context) => {
+    var response = await context.adminorders.OrderByDescending(s => s.date).ToArrayAsync();
+    
+    //Encode the csNameID, CSIID, deLinkID,, and onBaseDocumentNumber
+    for (int i = 0; i < response.Length; i++)
+    {
+        var tempDocUrl = response[i].docurl;
+        var tempCaseUrl = response[i].caseurl;
+
+        string docUrlParams = "";
+        string[] docUrlArr = tempDocUrl.Split(new string[] { "=" }, StringSplitOptions.None);
+
+        string[] caseUrlArr = tempCaseUrl.Split(new string[] { "=" }, StringSplitOptions.None);
+        string caseUrlParam = caseUrlArr[1];
+
+        for (int j = 1; j < docUrlArr.Length; j++)
+        {
+            string[] docUrlArr2 = docUrlArr[j].Split(new string[] { "&" }, StringSplitOptions.None);
+            docUrlParams += docUrlArr2[0];
+            if (j != docUrlArr.Length - 1)
+            {
+                docUrlParams += "_";
+            }
+        }
+        if (docUrlParams.EndsWith(" "))
+        {
+            docUrlParams = docUrlParams.TrimEnd(docUrlParams[docUrlParams.Length - 1]);
+        }
+        byte[] docHash = Encoding.UTF8.GetBytes(docUrlParams);
+        response[i].docurl = Convert.ToBase64String(docHash);
+
+        byte[] caseHash = Encoding.UTF8.GetBytes(caseUrlParam);
+        response[i].caseurl = Convert.ToBase64String(caseHash);
+    }
+    return response;
+});
 
 //Get All Aging Cases
-app.MapGet("/api/Aging-Submitted-Case-Report", async (DataContext context) => await context.agingcases.OrderByDescending(s => s.submissionDate).ThenBy(s => s.caseNumber).ToListAsync());
+app.MapGet("/api/Aging-Submitted-Case-Report", async (DataContext context) =>
+{
+    var response = await context.agingcases.OrderByDescending(s => s.submissionDate).ThenBy(s => s.caseNumber).ToArrayAsync();
+    for (int i = 0; i < response.Length; i++)
+    {
+        var tempCaseUrl = response[i].caseurl;
+
+        string[] caseUrlArr = tempCaseUrl.Split(new string[] { "=" }, StringSplitOptions.None);
+        string caseUrlParam = caseUrlArr[1];
+
+        byte[] caseHash = Encoding.UTF8.GetBytes(caseUrlParam);
+        response[i].caseurl = Convert.ToBase64String(caseHash);
+    }
+    return response;
+});
 
 //Get all COA Unpublished Orders
-app.MapGet("/api/COAUnpublishedOrders", async (DataContext context) => await context.coaunpublishedorders.OrderByDescending(s => s.date).ToListAsync());
+app.MapGet("/api/COAUnpublishedOrders", async (DataContext context) => {
+
+    var response = await context.coaunpublishedorders.OrderByDescending(s => s.date).ToArrayAsync();
+    
+    //Encode the csNameID, CSIID, deLinkID,, and onBaseDocumentNumber
+    for (int i = 0; i < response.Length; i++)
+    {
+        var tempDocUrl = response[i].docurl;
+        var tempCaseUrl = response[i].caseurl;
+
+        string docUrlParams = "";
+        string[] docUrlArr = tempDocUrl.Split(new string[] { "=" }, StringSplitOptions.None);
+
+        string[] caseUrlArr = tempCaseUrl.Split(new string[] { "=" }, StringSplitOptions.None);
+        string caseUrlParam = caseUrlArr[1];
+
+        for (int j = 1; j < docUrlArr.Length; j++)
+        {
+            string[] docUrlArr2 = docUrlArr[j].Split(new string[] { "&" }, StringSplitOptions.None);
+            docUrlParams += docUrlArr2[0];
+            if (j != docUrlArr.Length - 1)
+            {
+                docUrlParams += "_";
+            }
+        }
+        if (docUrlParams.EndsWith(" "))
+        {
+            docUrlParams = docUrlParams.TrimEnd(docUrlParams[docUrlParams.Length - 1]);
+        }
+        byte[] docHash = Encoding.UTF8.GetBytes(docUrlParams);
+        response[i].docurl = Convert.ToBase64String(docHash);
+
+        byte[] caseHash = Encoding.UTF8.GetBytes(caseUrlParam);
+        response[i].caseurl = Convert.ToBase64String(caseHash);
+    }
+    return response;
+});
 
 //Get all Unpublished Orders
-app.MapGet("/api/UnpublishedOrders", async (DataContext context) => await context.unpublishedorders.OrderByDescending(s => s.date).ToListAsync());
+app.MapGet("/api/UnpublishedOrders", async (DataContext context) => {
+    var response = await context.unpublishedorders.OrderByDescending(s => s.date).ToArrayAsync();
+    
+    //Encode the csNameID, CSIID, deLinkID,, and onBaseDocumentNumber
+    for (int i = 0; i < response.Length; i++)
+    {
+        var tempDocUrl = response[i].docurl;
+        var tempCaseUrl = response[i].caseurl;
+
+        string docUrlParams = "";
+        string[] docUrlArr = tempDocUrl.Split(new string[] { "=" }, StringSplitOptions.None);
+
+        string[] caseUrlArr = tempCaseUrl.Split(new string[] { "=" }, StringSplitOptions.None);
+        string caseUrlParam = caseUrlArr[1];
+
+        for (int j = 1; j < docUrlArr.Length; j++)
+        {
+            string[] docUrlArr2 = docUrlArr[j].Split(new string[] { "&" }, StringSplitOptions.None);
+            docUrlParams += docUrlArr2[0];
+            if (j != docUrlArr.Length - 1)
+            {
+                docUrlParams += "_";
+            }
+        }
+        if (docUrlParams.EndsWith(" "))
+        {
+            docUrlParams = docUrlParams.TrimEnd(docUrlParams[docUrlParams.Length - 1]);
+        }
+        byte[] docHash = Encoding.UTF8.GetBytes(docUrlParams);
+        response[i].docurl = Convert.ToBase64String(docHash);
+
+        byte[] caseHash = Encoding.UTF8.GetBytes(caseUrlParam);
+        response[i].caseurl = Convert.ToBase64String(caseHash);
+    }
+    return response;
+});
 
 //Get statistics by one or two options and year
 app.MapGet("/api/Statistics/{courtID1}/{courtID2}/{year}", async (int courtID1, int courtID2, int year, DataContext context) =>
 {
     //Initalize an empty array that will hold all the data. Since no court equals 9999, the array will be an empty "Statistic" object.
-    var tempVariable = await context.statistics.Where(s => s.courtID.Equals(999)).ToArrayAsync();
+    var tempVariable = await context.statistics.Where(s => s.courtID.Equals(9999)).ToArrayAsync();
     var statisticData = tempVariable.Where(s => s.courtID.Equals(999));
 
     //Initalize variables to calculate whether an All Courts or Judicial District option was selected.

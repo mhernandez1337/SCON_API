@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\WebSupplementalAPI.csproj": {}
+    "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\WebSupplementalAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\WebSupplementalAPI.csproj": {
+    "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\WebSupplementalAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\WebSupplementalAPI.csproj",
+        "projectUniqueName": "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\WebSupplementalAPI.csproj",
         "projectName": "WebSupplementalAPI",
-        "projectPath": "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\WebSupplementalAPI.csproj",
+        "projectPath": "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\WebSupplementalAPI.csproj",
         "packagesPath": "C:\\Users\\mhernandez\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mhernandez\\source\\repos\\WebSupplementalAPI\\WebSupplementalAPI\\obj\\publish\\win-x64\\",
+        "outputPath": "C:\\Users\\mhernandez\\source\\repos\\SCON_API\\WebSupplementalAPI\\obj\\publish\\win-x64\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\mhernandez\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -82,7 +82,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {
